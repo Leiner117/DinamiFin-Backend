@@ -14,7 +14,7 @@ def startup_event():
     print("Tablas verificadas o creadas correctamente.")
 
 # Incluir todas las rutas de la API
-#app.include_router(api_router)
+app.include_router(api_router)
 
 # Middleware CORS (ajustar en producción)
 app.add_middleware(
