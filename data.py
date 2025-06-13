@@ -5,7 +5,8 @@ from models import (
     Base, User, Income, Expense, Saving, Investment,
     ExpenseGoal, SavingGoal, InvestmentGoal
 )
-
+from passlib.context import CryptContext
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 # Asegura que las tablas existan (puedes omitir si ya las migraste)
 Base.metadata.create_all(bind=engine)
 
@@ -17,7 +18,7 @@ def seed_data():
             id=1,
             username="testuser",
             email="testuser@example.com",
-            password="a123"
+            password=pwd_context.hash("a123")
         )
         db.merge(user)  # merge evita duplicados por PK
 
