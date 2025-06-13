@@ -64,7 +64,7 @@ def get_expense_history(
 ):
     start = periodo_to_start_date(periodo)
     end = date.today()
-    res = db.query(Income).filter(Income.user_id == user_id, Income.date >= start, Income.date <= end).all()
+    res = db.query(Expense).filter(Expense.user_id == user_id, Expense.date >= start, Expense.date <= end).all()
     return group_by_month(res, "amount", start, end)
 
 @router.get("/saving/{user_id}", response_model=List[FinanceHistoryRecord])
