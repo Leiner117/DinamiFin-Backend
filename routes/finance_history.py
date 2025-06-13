@@ -15,26 +15,29 @@ router = APIRouter(
 def periodo_to_start_date(periodo: str):
     hoy = date.today()
     if periodo == "1m":
-        return hoy.replace(day=1)
+        return hoy - timedelta(days=30)
     elif periodo == "6m":
-        month = hoy.month - 5 if hoy.month > 5 else hoy.month + 7
-        year = hoy.year if hoy.month > 5 else hoy.year - 1
-        return date(year, month, 1)
+        return hoy - timedelta(days=180)
     elif periodo == "1y":
-        return date(hoy.year - 1, hoy.month, 1)
+        return hoy - timedelta(days=365)
     elif periodo == "3y":
-        return date(hoy.year - 3, hoy.month, 1)
+        return hoy - timedelta(days=1095)
     elif periodo == "5y":
-        return date(hoy.year - 5, hoy.month, 1)
+        return hoy - timedelta(days=1825)
     return hoy.replace(day=1)
 
-# Generic group by year-month
-def group_by_month(records, field="amount"):
+def group_by_month(records, field="amount", start_date=None, end_date=None):
     res = {}
+    current = start_date.replace(day=1)
+    while current <= end_date:
+        key = f"{current.year}-{current.month:02d}"
+        res[key] = 0
+        current += timedelta(days=32)
+        current = current.replace(day=1)
     for r in records:
         key = f"{r.date.year}-{r.date.month:02d}"
-        res.setdefault(key, 0)
-        res[key] += getattr(r, field)
+        if key in res:
+            res[key] += getattr(r, field)
     return [{"period": k, "total": v} for k, v in sorted(res.items())]
 
 # HISTÓRICO GENERAL
@@ -45,8 +48,13 @@ def get_income_history(
     db: Session = Depends(get_db),
 ):
     start = periodo_to_start_date(periodo)
-    res = db.query(Income).filter(Income.user_id == user_id, Income.date >= start).all()
-    return group_by_month(res)
+    end = date.today()  # Fecha final es hoy
+    res = db.query(Income).filter(
+        Income.user_id == user_id, 
+        Income.date >= start,
+        Income.date <= end  # Filtra hasta hoy
+    ).all()
+    return group_by_month(res, "amount", start, end)  # Pasa fechas
 
 @router.get("/expense/{user_id}", response_model=List[FinanceHistoryRecord])
 def get_expense_history(
@@ -55,8 +63,9 @@ def get_expense_history(
     db: Session = Depends(get_db),
 ):
     start = periodo_to_start_date(periodo)
-    res = db.query(Expense).filter(Expense.user_id == user_id, Expense.date >= start).all()
-    return group_by_month(res)
+    end = date.today()
+    res = db.query(Income).filter(Income.user_id == user_id, Income.date >= start, Income.date <= end).all()
+    return group_by_month(res, "amount", start, end)
 
 @router.get("/saving/{user_id}", response_model=List[FinanceHistoryRecord])
 def get_saving_history(
@@ -65,8 +74,9 @@ def get_saving_history(
     db: Session = Depends(get_db),
 ):
     start = periodo_to_start_date(periodo)
+    end = date.today() 
     res = db.query(Saving).filter(Saving.user_id == user_id, Saving.date >= start).all()
-    return group_by_month(res)
+    return group_by_month(res, "amount", start, end)
 
 @router.get("/investment/{user_id}", response_model=List[FinanceHistoryRecord])
 def get_investment_history(
@@ -75,8 +85,9 @@ def get_investment_history(
     db: Session = Depends(get_db),
 ):
     start = periodo_to_start_date(periodo)
+    end = date.today() 
     res = db.query(Investment).filter(Investment.user_id == user_id, Investment.date >= start).all()
-    return group_by_month(res)
+    return group_by_month(res, "amount", start, end)
 
 # GOALS
 
