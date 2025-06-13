@@ -21,3 +21,7 @@ from .saving_goal import SavingGoalCreate, SavingGoalRead
 
 # Esquemas de metas de inversión
 from .investment_goal import InvestmentGoalCreate, InvestmentGoalRead
+
+from .finance_history_record import FinanceHistoryRecord
+
+from .goal_history_record import GoalHistoryRecord

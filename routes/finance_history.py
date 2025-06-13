@@ -3,8 +3,8 @@ from sqlalchemy.orm import Session
 from datetime import date, timedelta
 from typing import List, Optional, Dict
 from db import get_db 
-from ..models import Income, Expense, Saving, Investment, ExpenseGoal, SavingGoal, InvestmentGoal
-from ..schemas import FinanceHistoryRecord, GoalHistoryRecord 
+from models import Income, Expense, Saving, Investment, ExpenseGoal, SavingGoal, InvestmentGoal
+from schemas import FinanceHistoryRecord, GoalHistoryRecord 
 
 router = APIRouter(
     prefix="/history",
