@@ -1,18 +1,15 @@
 from datetime import date
-from typing import Optional
+from pydantic import BaseModel
 
-from pydantic import BaseModel, EmailStr
-
-class InvestmentBase(BaseModel):
+class InvestmentGoalBase(BaseModel):
     date: date
-    amount: float
-    category: Optional[str] = None
+    value: float
 
-class InvestmentCreate(InvestmentBase):
+class InvestmentGoalCreate(InvestmentGoalBase):
     user_id: int
 
-class InvestmentRead(InvestmentBase):
+class InvestmentGoalRead(InvestmentGoalBase):
     user_id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True  # Pydantic v2
