@@ -15,3 +15,11 @@ class UserRead(UserBase):
 
     class Config:
         orm_mode = True
+
+class PerfilUpdate(BaseModel):
+    email: str | None = None
+    username: str | None = None
+    password: str | None = None
+    meta_gasto: float | None = None
+    meta_ahorro: float | None = None
+    meta_inversion: float | None = None
