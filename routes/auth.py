@@ -76,7 +76,7 @@ def login(data: LoginRequest, db: Session = Depends(get_db)):
     if not user or not pwd_context.verify(data.password, user.password):
         raise HTTPException(status_code=401, detail="Credenciales inválidas")
 
-    token_data = {"sub": user.email, "user_id": user.id}
+    token_data = {"sub": user.email, "user_id": user.id, "username": user.username}
     token = jwt.encode(token_data, SECRET_KEY, algorithm=ALGORITHM)
     return {"access_token": token, "token_type": "bearer"}
 
