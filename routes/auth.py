@@ -76,7 +76,7 @@ def login(data: LoginRequest, db: Session = Depends(get_db)):
     if not user or not pwd_context.verify(data.password, user.password):
         raise HTTPException(status_code=401, detail="Credenciales inválidas")
 
-    token_data = {"sub": user.email, "user_id": user.id, "username": user.username}
+    token_data = {"sub": str(user.id), "user_id": user.id, "username": user.username, "email": user.email}
     token = jwt.encode(token_data, SECRET_KEY, algorithm=ALGORITHM)
     return {"access_token": token, "token_type": "bearer"}
 
@@ -99,4 +99,24 @@ def get_dashboard(credentials: HTTPAuthorizationCredentials = Depends(security),
         "email": user.email,
         "username": user.username
     }
+def get_current_user(
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+    db: Session = Depends(get_db)
+):
+    try:
+        payload = jwt.decode(credentials.credentials, SECRET_KEY, algorithms=[ALGORITHM])
+        user_id = payload.get("user_id")
+        if user_id is None:
+            raise HTTPException(status_code=401, detail="Token inválido")
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Token inválido")
+
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+
+    return user
+
+def get_password_hash(password: str) -> str:
+    return pwd_context.hash(password)
 

@@ -5,11 +5,13 @@ from routes import router as api_router
 from db import Base, engine
 from routes.auth import router as auth_router
 from routes.importacion import router as import_router
+from routes.perfil import router as perfil_router
 
 app = FastAPI()
 
 app.include_router(auth_router)
 app.include_router(import_router)
+app.include_router(perfil_router)
 
 # Crear la base de datos al arrancar si no existe
 @app.on_event("startup")
