@@ -20,9 +20,8 @@ async def get_current_month_income(
     """Obtiene el total de ingresos del mes actual para un usuario"""
     today = date.today()
     first_day = today.replace(day=1)
-    last_day = today.replace(day=28)  # Empezamos con el día 28
+    last_day = today.replace(day=28)
     
-    # Ajustamos para el último día del mes
     while True:
         try:
             last_day = last_day.replace(day=last_day.day + 1)
