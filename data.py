@@ -22,7 +22,7 @@ def seed_data():
         db.merge(user)
 
         hoy = date.today()
-        anios = 5  # Cambia la cantidad de años que desees
+        anios = 5 
         meses_por_anio = 12
 
         for y in range(anios):
@@ -69,13 +69,12 @@ def seed_data():
                     db.merge(Investment(date=fecha_inversion, user_id=user.id, amount=inversion, category=categoria_inv))
 
                 # Metas (una por mes)
-                meta_gasto = random.randint(800, 1800)
-                meta_ahorro = random.randint(200, 1000)
-                meta_inversion = random.randint(100, 600)
+                meta_gasto = random.randint(5, 50)        # Porcentaje de gasto
+                meta_ahorro = random.randint(5, 50)       # Porcentaje de ahorro
+                meta_inversion = random.randint(5, 50)    # Porcentaje de inversión
                 db.merge(ExpenseGoal(date=fecha_mes, user_id=user.id, value=meta_gasto))
                 db.merge(SavingGoal(date=fecha_mes, user_id=user.id, value=meta_ahorro))
                 db.merge(InvestmentGoal(date=fecha_mes, user_id=user.id, value=meta_inversion))
-
         db.commit()
         print("Datos de prueba cargados correctamente.\n")
 

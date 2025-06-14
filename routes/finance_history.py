@@ -89,22 +89,22 @@ def get_investment_history(
     res = db.query(Investment).filter(Investment.user_id == user_id, Investment.date >= start).all()
     return group_by_month(res, "amount", start, end)
 
-# GOALS
-
-def group_goal_by_month(real, goal):
+def group_goal_by_month(real, goal, incomes):
     out = {}
-    # Agrupa ambos por mes
     for r in real:
         key = f"{r.date.year}-{r.date.month:02d}"
-        out.setdefault(key, {"real": 0, "goal": 0})
+        out.setdefault(key, {"real": 0, "goal": 0, "income": 0})
         out[key]["real"] += getattr(r, "amount", getattr(r, "value", 0))
     for g in goal:
         key = f"{g.date.year}-{g.date.month:02d}"
-        out.setdefault(key, {"real": 0, "goal": 0})
-        out[key]["goal"] += getattr(g, "value", getattr(g, "amount", 0))
-    # Ordena y devuelve lista
+        out.setdefault(key, {"real": 0, "goal": 0, "income": 0})
+        out[key]["goal"] = getattr(g, "value", getattr(g, "amount", 0))
+    for i in incomes:
+        key = f"{i.date.year}-{i.date.month:02d}"
+        out.setdefault(key, {"real": 0, "goal": 0, "income": 0})
+        out[key]["income"] += getattr(i, "amount", getattr(i, "value", 0))
     return [
-        {"period": k, "real": v["real"], "goal": v["goal"]}
+        {"period": k, "real": v["real"], "goal": v["goal"], "income": v["income"]}
         for k, v in sorted(out.items())
     ]
 
@@ -117,7 +117,8 @@ def get_expense_goal_history(
     start = periodo_to_start_date(periodo)
     real = db.query(Expense).filter(Expense.user_id == user_id, Expense.date >= start).all()
     goals = db.query(ExpenseGoal).filter(ExpenseGoal.user_id == user_id, ExpenseGoal.date >= start).all()
-    return group_goal_by_month(real, goals)
+    incomes = db.query(Income).filter(Income.user_id == user_id, Income.date >= start).all()
+    return group_goal_by_month(real, goals, incomes)
 
 @router.get("/saving_goal/{user_id}", response_model=List[GoalHistoryRecord])
 def get_saving_goal_history(
@@ -128,7 +129,8 @@ def get_saving_goal_history(
     start = periodo_to_start_date(periodo)
     real = db.query(Saving).filter(Saving.user_id == user_id, Saving.date >= start).all()
     goals = db.query(SavingGoal).filter(SavingGoal.user_id == user_id, SavingGoal.date >= start).all()
-    return group_goal_by_month(real, goals)
+    incomes = db.query(Income).filter(Income.user_id == user_id, Income.date >= start).all()
+    return group_goal_by_month(real, goals, incomes)
 
 @router.get("/investment_goal/{user_id}", response_model=List[GoalHistoryRecord])
 def get_investment_goal_history(
@@ -139,4 +141,5 @@ def get_investment_goal_history(
     start = periodo_to_start_date(periodo)
     real = db.query(Investment).filter(Investment.user_id == user_id, Investment.date >= start).all()
     goals = db.query(InvestmentGoal).filter(InvestmentGoal.user_id == user_id, InvestmentGoal.date >= start).all()
-    return group_goal_by_month(real, goals)
+    incomes = db.query(Income).filter(Income.user_id == user_id, Income.date >= start).all()
+    return group_goal_by_month(real, goals, incomes)
