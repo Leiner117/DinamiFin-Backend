@@ -8,7 +8,7 @@ class IncomeBase(BaseModel):
     amount: float
 
 class IncomeCreate(IncomeBase):
-    user_id: int
+    pass
 
 class IncomeRead(IncomeBase):
     user_id: int
