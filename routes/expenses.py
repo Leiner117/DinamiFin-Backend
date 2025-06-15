@@ -32,7 +32,6 @@ class ExpenseCreate(BaseModel):
     def validate_date_format(cls, v):
         if not isinstance(v, date):
             try:
-                # Intentar convertir la cadena a fecha
                 v = date.fromisoformat(str(v))
             except ValueError:
                 raise ValueError("La fecha debe estar en formato YYYY-MM-DD")
